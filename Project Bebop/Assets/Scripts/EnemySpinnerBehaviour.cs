@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemySpinnerBehaviour : MonoBehaviour
 {
-    [SerializeField] float rotationSpeed = 10f;
+    [SerializeField] float rotationSpeed = 100f;
     // Start is called before the first frame update
     void Start()
     {

@@ -6,14 +6,21 @@ public class Movement : MonoBehaviour
 {
     [SerializeField] float thrustPower = 1000.0f;
     [SerializeField] float rotationStrenth = 100.0f;
+    // Audio clips
+    [SerializeField] AudioClip thrusterClip;
+    [SerializeField] ParticleSystem mainBoosterParticles;
+    [SerializeField] ParticleSystem leftBooster1Particles;
+    [SerializeField] ParticleSystem leftBooster2Particles;
+    [SerializeField] ParticleSystem rightBooster1Particles;
+    [SerializeField] ParticleSystem rightBooster2Particles;
     Rigidbody rocketRigidbody;
-    AudioSource rocketThruster;
+    AudioSource audioSource;
 
     // Start is called before the first frame update
     void Start()
     {
         rocketRigidbody = GetComponent<Rigidbody>();
-        rocketThruster = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -27,17 +34,11 @@ public class Movement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            // rocketRigidbody.AddForce(Vector3.up);
-            rocketRigidbody.AddRelativeForce(Vector3.up * thrustPower * Time.deltaTime);
-            if (!rocketThruster.isPlaying)
-            {
-                rocketThruster.Play();
-            }
-
+            StartThrusting();
         }
         else
         {
-            rocketThruster.Stop();
+            StopThrusting();
         }
     }
 
@@ -45,13 +46,52 @@ public class Movement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.A))
         {
-            ApplyRotation(rotationStrenth);
+            RotateLeft();
         }
-        else if (Input.GetKey(KeyCode.D))
+        else
         {
-            ApplyRotation(-rotationStrenth);
+            StopRightBoosterParticles();
         }
+        if (Input.GetKey(KeyCode.D))
+        {
+            RotateRight();
+        }
+        else
+        {
+            StopLeftBoosterParticles();
+        }
+    }
 
+    private void StartThrusting()
+    {
+        // rocketRigidbody.AddForce(Vector3.up);
+        rocketRigidbody.AddRelativeForce(Vector3.up * thrustPower * Time.deltaTime);
+        if (!mainBoosterParticles.isPlaying)
+        {
+            mainBoosterParticles.Play();
+        }
+        if (!audioSource.isPlaying)
+        {
+            audioSource.PlayOneShot(thrusterClip);
+        }
+    }
+
+    private void StopThrusting()
+    {
+        audioSource.Stop();
+        mainBoosterParticles.Stop();
+    }
+
+    private void RotateLeft()
+    {
+        ApplyRotation(rotationStrenth);
+        FireRightBoosterParticles();
+    }
+
+    private void RotateRight()
+    {
+        ApplyRotation(-rotationStrenth);
+        FireLeftBoosterParticles();
     }
 
     private void ApplyRotation(float rotationThisFrame)
@@ -62,6 +102,36 @@ public class Movement : MonoBehaviour
             RigidbodyConstraints.FreezeRotationX | // freezing rotation on the X
             RigidbodyConstraints.FreezeRotationY | // freezing rotation on the Y
             RigidbodyConstraints.FreezePositionZ; // freezing rotation on the Z
+    }
+
+    private void FireLeftBoosterParticles()
+    {
+        if (!leftBooster1Particles.isPlaying && !leftBooster2Particles.isPlaying)
+        {
+            leftBooster1Particles.Play();
+            leftBooster2Particles.Play();
+        }
+    }
+
+    private void StopLeftBoosterParticles()
+    {
+        leftBooster1Particles.Stop();
+        leftBooster2Particles.Stop();
+    }
+
+    private void FireRightBoosterParticles()
+    {
+        if (!rightBooster1Particles.isPlaying && !rightBooster2Particles.isPlaying)
+        {
+            rightBooster1Particles.Play();
+            rightBooster2Particles.Play();
+        }
+    }
+
+    private void StopRightBoosterParticles()
+    {
+        rightBooster1Particles.Stop();
+        rightBooster2Particles.Stop();
     }
 
 }
